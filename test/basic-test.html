@@ -23,6 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script src="../../iron-test-helpers/mock-interactions.js"></script>
 
   <link rel="import" href="../dc-password-input.html">
+  <link rel="import" href="letters-only.html">
 
 </head>
 <body>
@@ -51,6 +52,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
   </test-fixture>
 
+  <test-fixture id="error">
+    <template>
+      <dc-password-input auto-validate pattern="[0-9]*" value="foobar" error-message="error"></dc-password-input>
+    </template>
+  </test-fixture>
+
   <test-fixture id="required">
     <template>
       <dc-password-input auto-validate required error-message="error"></dc-password-input>
@@ -60,6 +67,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <test-fixture id="required-no-auto-validate">
     <template>
       <dc-password-input required error-message="error"></dc-password-input>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="required-char-counter">
+    <template>
+      <dc-password-input auto-validate char-counter required error-message="error"></dc-password-input>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="char-counter">
+    <template>
+      <dc-password-input char-counter value="foobar"></dc-password-input>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="always-float-label">
+    <template>
+      <dc-password-input always-float-label label="foo"></dc-password-input>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="placeholder">
+    <template>
+      <dc-password-input label="foo" placeholder="bar"></dc-password-input>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="date">
+    <template>
+      <dc-password-input label="foo" type="date"></dc-password-input>
+    </template>
+  </test-fixture>
+
+  <letters-only></letters-only>
+
+  <test-fixture id="validator">
+    <template>
+      <dc-password-input value="123123" validator="letters-only" auto-validate></dc-password-input>
     </template>
   </test-fixture>
 
@@ -73,6 +118,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.equal(input.inputElement.value, input.value, 'inputElement.value equals input.value');
       });
 
+      test('placeholder does not overlap label', function() {
+        var input = fixture('placeholder');
+        assert.equal(input.inputElement.placeholder, input.placeholder, 'inputElement.placeholder equals input.placeholder');
+        assert.equal(input.noLabelFloat, false);
+        var floatingLabel = Polymer.dom(Polymer.dom(input.root).querySelector('paper-input-container').root).querySelector('.label-is-floating');
+        assert.ok(floatingLabel);
+      });
+
+      test('special types autofloat the label', function() {
+        var input = fixture('date');
+        // Browsers that don't support special <input> types like `date` fallback
+        // to `text`, so make sure to only test if type is still preserved after
+        // the element is attached.
+        if (input.inputElement.type === "date") {
+          assert.equal(input.alwaysFloatLabel, true);
+          var floatingLabel = Polymer.dom(Polymer.dom(input.root).querySelector('paper-input-container').root).querySelector('.label-is-floating');
+          assert.ok(floatingLabel);
+        }
+      });
+
+      test('always-float-label attribute works without placeholder', function() {
+        var input = fixture('always-float-label');
+        var container = Polymer.dom(input.root).querySelector('paper-input-container');
+        var inputContent = Polymer.dom(container.root).querySelector('.input-content');
+        assert.isTrue(inputContent.classList.contains('label-is-floating'), 'label is floating');
+      });
+
+      test('error message is displayed', function() {
+        var input = fixture('error');
+        forceXIfStamp(input);
+        var error = Polymer.dom(input.root).querySelector('paper-input-error');
+        assert.ok(error, 'paper-input-error exists');
+        assert.notEqual(getComputedStyle(error).display, 'none', 'error is not display:none');
+      });
+
       test('empty required input shows error', function() {
         var input = fixture('required');
         forceXIfStamp(input);
@@ -80,6 +160,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.ok(error, 'paper-input-error exists');
         assert.notEqual(getComputedStyle(error).display, 'none', 'error is not display:none');
       });
+
+      test('character counter is displayed', function() {
+        var input = fixture('char-counter');
+        forceXIfStamp(input);
+        var counter = Polymer.dom(input.root).querySelector('paper-input-char-counter')
+        assert.ok(counter, 'paper-input-char-counter exists');
+        assert.equal(counter._charCounterStr, input.value.length, 'character counter shows the value length');
+      });
+
+      test('validator is used', function() {
+        var input = fixture('validator');
+        assert.ok(input.inputElement.invalid, 'input is invalid');
+      });
+
+      test('caret position is preserved', function() {
+        var input = fixture('basic');
+        var ironInput = Polymer.dom(input.root).querySelector('input[is="iron-input"]');
+        input.value = 'nananana';
+        ironInput.selectionStart = 2;
+        ironInput.selectionEnd = 2;
+
+        input.updateValueAndPreserveCaret('nanananabatman');
+
+        assert.equal(ironInput.selectionStart, 2, 'selectionStart is preserved');
+        assert.equal(ironInput.selectionEnd, 2, 'selectionEnd is preserved');
+      });
+
     });
 
     suite('focus/blur events', function() {
@@ -151,6 +258,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         forceXIfStamp(input);
         assert.isTrue(input.inputElement.hasAttribute('aria-describedby'));
         assert.equal(input.inputElement.getAttribute('aria-describedby'), Polymer.dom(input.root).querySelector('paper-input-error').id, 'aria-describedby points to the error message');
+      });
+
+      test('has aria-describedby for character counter', function() {
+        var input = fixture('char-counter');
+        forceXIfStamp(input);
+        assert.isTrue(input.inputElement.hasAttribute('aria-describedby'));
+        assert.equal(input.inputElement.getAttribute('aria-describedby'), Polymer.dom(input.root).querySelector('paper-input-char-counter').id, 'aria-describedby points to the character counter');
+      });
+
+      test('has aria-describedby for character counter and error', function() {
+        var input = fixture('required-char-counter');
+        forceXIfStamp(input);
+        assert.isTrue(input.inputElement.hasAttribute('aria-describedby'));
+        assert.equal(input.inputElement.getAttribute('aria-describedby'), Polymer.dom(input.root).querySelector('paper-input-error').id + ' ' + Polymer.dom(input.root).querySelector('paper-input-char-counter').id, 'aria-describedby points to the error message and character counter');
       });
 
       test('focus an input with tabindex', function(done) {

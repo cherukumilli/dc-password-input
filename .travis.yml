@@ -1,25 +1,26 @@
 language: node_js
 sudo: false
 before_script:
-  - npm install -g bower polylint web-component-tester
-  - bower install
-  - polylint
+- npm install -g bower polylint web-component-tester
+- bower install
+- export PATH=$PWD/node_modules/.bin:$PATH
+- polylint
 env:
   global:
-    - secure: gZ5vpMlc9fuKSZeMmT6xf4+FIVWxET6f6Lkp6l5Qo9vL2X/KC/bMJF1v2w5xXFLFTdm/hPUDkeQRDUBBJhGcsXhJeWIvAXdPkObV9ZPRwpDnnN1qU5lOqVIy6gFjDm2Wm6UNXcRnyP1TrGpMwbG13EUtD0rF8LZqBm3B833sKS4=
-    - secure: DObDewETPYiIsASeC3UETPbQ6YBniRZdNV2eTM1xULvuFNDxXJD09KKyWOiMduublEIJRXLjBIXmD8cbVsgrbRUYA4bxcXffDeuc6q6HaQGU9HvIbLz6o3/oxi4fX2G9GwrZtijW2p2Rgw2l9koR3ovjcM97CSTWFUMh5rtXag8=
-    - CXX=g++-4.8
+  - CXX=g++-4.8
+  - secure: GlICfttz4wBDHE5ZpQf47nn8tMGpVidkbVtdstPNBmZB4JhLMuYc5Tp0fQmaCp1B72l6p6FleGoyBH27NACiAJziHM8ILVyczjKhUrvA9vFhT0tX6Fnrpf7jF4oh4rRLhlGHlildCYwUg/Q0y38J75knfN0vWubXjVMMf5yQ8hDIF37PBZ61pADpc5uFYFctl37yqmxIOy1c7/wYGM32x8w9a3ZJi7M7uQdYLVQCVORXlkOm9idNHEqKn4RWweaxpSandB58BiOn2UWk0pUb402z9d1yFV+ngSGRuD+FFcTpXF3LluyKac22/jbhXjucXK4T9KpFlvntWNJWA9iqblc9oqwG1K50gINaPPrw+6vzlM/TIfgouWS2fAUDCzDzEYMMVfPlxqX1xvW0yW8NSf3Q2i/upcsMDJFIjyvY57dWCBO7Stb9SVCvoRFH9rXWAGiKdUUtkoX8eyHN9EWB/6s8hXVIvHo8K7uxNRd/jB7Ott2TpZV9pClzLl/GhbwBEbl4uIwsSEqq28pMqH6GW7cafZMwXy5p4PioLplLjCQQgDP+fn7b3Al7cOBmNL6lF3o0tpJhyJqCVreYjdbBciuaOdfnwYVt0jFZ4C8Q2e29FyCrwLIEqrqxt0qDhaHZD8vkHDPDYrlM4hDFVHxXCLvI7UegBUTWbWnzuAVG6zg=
+  - secure: ANJU0sMgfXRn+vvd4d4GQ1wmIrBlusy9vJ62I3gEad5tVZaJsr1wisJUhGLeTYxeuqFMnzNenUe1fF78lzfyDBhYAdJuOAwalVvsT2waBk/DqpNsIBvCVBdGuBymdJEej2ktH7ncG2/+VFsRktIA0pQnA29Q5fKJvsqk5SIAvFSLZqZHRU57VoWXXaQ0V9At0na9gjoKVSbZuxPESO4QAN0MdnKCi0t67Msesp0B8lMG4SWoeTpyFKdQdVFZ2PbvzgGf+WvAFo4NKTWOmyvvH+TsFgDwAS2RQMAW05uJbW853oO/6G9B/0B52t6W1g0apsv5RhxUFnLVdP3EtsErRlE4e6J/pbOONVhoAIfF+e7JXts292tJEMxqcWPwBf1NzTD+ECI4ZeDguUiYK7eMWIUW2aW0vH1x7UxEj2ky4avPaUvv1MdMcj9FNRXirMABcwZ6g2eWsKheMRc2BtXncy37+F4B2T5H788+hdY7jjUbGYYxoTkGnCniCF62XEbF1FUpGNBcxLpmmAJi/MiimAnEuGyozMN7Gz3FONgC1kpK+03geF7ragtHP68EZRp540Be+djYxoQ5Kh8IxwJH2CGsInGuXkAVBqsPbXRgnjxGZVfkiBuBAw40N+2LdxgOLjMnDh+HTIDScJCm+Y+aT7IZ+fv4doOLAQlg21Q4Kvc=
 node_js: stable
 addons:
   firefox: latest
   apt:
     sources:
-      - google-chrome
-      - ubuntu-toolchain-r-test
+    - google-chrome
+    - ubuntu-toolchain-r-test
     packages:
-      - google-chrome-stable
-      - g++-4.8
+    - google-chrome-stable
+    - g++-4.8
   sauce_connect: true
 script:
-  - xvfb-run wct
-  - "if [ \"${TRAVIS_PULL_REQUEST}\" = \"false\" ]; then wct -s 'default'; fi"
+- xvfb-run wct --skip-plugin sauce
+- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then wct --skip-plugin local; fi
