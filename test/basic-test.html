@@ -108,6 +108,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
   </test-fixture>
 
+  <test-fixture id="clear">
+    <template>
+      <dc-password-input value="Test Clear Button"></dc-password-input>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="show-password">
+    <template>
+      <dc-password-input value="Show Password"></dc-password-input>
+    </template>
+  </test-fixture>
+
   <script>
 
     suite('basic', function() {
@@ -285,6 +297,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           });
         });
       });
+    });
+
+    suite('clear icon click test', function() {
+
+      test('clear input on clear icon click', function() {
+        var input = fixture('clear');
+        assert.equal(input.value, 'Test Clear Button', 'Before Clearing input.value equals Test Clear Button');
+        Polymer.dom(input.root).querySelector('#clear').click();
+        assert.equal(input.value, '', 'input.value equals empty string');
+      });
+
+    });
+
+    suite('password icon click test', function() {
+
+      test('reveal/hide password on show password icon click', function() {
+        var input = fixture('show-password');
+        forceXIfStamp(input);
+
+        var showPasswordIcon = Polymer.dom(input.root).querySelector('#showPasswordIcon');
+        assert.equal(input.type, 'password', 'Before show password click, type equals password');
+
+        showPasswordIcon.click();
+        assert.equal(input.type, '', 'clicking on show password icon changes type to empty string');
+        assert.equal(showPasswordIcon.icon, 'visibility', 'After show password click, show password icon equals visibility');
+
+        showPasswordIcon.click();
+        assert.equal(input.type, 'password', 'clicking on show password icon again changes type to password');
+        assert.equal(showPasswordIcon.icon, 'visibility-off', 'clicking on show password icon again changes show password icon to visibility-off');
+      });
+
     });
 
   </script>
