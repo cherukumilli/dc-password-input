@@ -317,14 +317,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         forceXIfStamp(input);
 
         var showPasswordIcon = Polymer.dom(input.root).querySelector('#showPasswordIcon');
-        assert.equal(input.type, 'password', 'Before show password click, type equals password');
+        assert.equal(input._type, 'password', 'Before show password click, type equals password');
 
         showPasswordIcon.click();
-        assert.equal(input.type, '', 'clicking on show password icon changes type to empty string');
+        assert.equal(input._type, '', 'clicking on show password icon changes type to empty string');
         assert.equal(showPasswordIcon.icon, 'visibility', 'After show password click, show password icon equals visibility');
 
         showPasswordIcon.click();
-        assert.equal(input.type, 'password', 'clicking on show password icon again changes type to password');
+        assert.equal(input._type, 'password', 'clicking on show password icon again changes type to password');
         assert.equal(showPasswordIcon.icon, 'visibility-off', 'clicking on show password icon again changes show password icon to visibility-off');
       });
 
